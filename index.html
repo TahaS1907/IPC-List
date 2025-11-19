@@ -129,6 +129,11 @@
       </div>
       <div class="hint">Seçili sheet + PN filtresine göre.</div>
     </div>
+     <label style="margin-top: 8px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted);">
+      <input type="checkbox" id="hideEmptyFunc" />
+      <span>Fonksiyonu boş olanları gizle</span>
+    </label>
+      </div>
   </section>
 
   <!-- Sonuçlar -->
@@ -207,21 +212,29 @@
   }
 
   function render() {
-    const sheetSelect = document.getElementById("sheetSelect");
-    const pnInput = document.getElementById("pnInput");
-    const results = document.getElementById("results");
-    const countChip = document.getElementById("resultCount");
+  var sheetSelect = document.getElementById('sheetSelect');
+  var pnInput = document.getElementById('pnInput');
+  var results = document.getElementById('results');
+  var countChip = document.getElementById('resultCount');
+  var hideEmptyFunc = document.getElementById('hideEmptyFunc');
+ 
+  var sheet = sheetSelect.value;
+  var pnQ = (pnInput.value || '').toString().trim().toUpperCase();
+ 
+  var allRows = IPC_DATA[sheet] || [];
+  var filtered = allRows.filter(function(r) {
+    if (!pnQ) return true;
+    var pn = (r.pn || '').toString().toUpperCase();
+    var desc = (r.desc || '').toString().toUpperCase();
+    return pn.indexOf(pnQ) !== -1 || desc.indexOf(pnQ) !== -1;
+  });
+ 
 
-    const sheet = sheetSelect.value;
-    const pnQ = (pnInput.value || "").toString().trim().toUpperCase();
-
-    const allRows = IPC_DATA[sheet] || [];
-    const filtered = allRows.filter((r) => {
-      if (!pnQ) return true;
-      const pn = (r.pn || "").toString().toUpperCase();
-      const desc = (r.desc || "").toString().toUpperCase();
-      return pn.includes(pnQ) || desc.includes(pnQ);
+  if (hideEmptyFunc && hideEmptyFunc.checked) {
+    filtered = filtered.filter(function(r) {
+      return (r.func || '').toString().trim() !== '';
     });
+  }
 
     countChip.textContent = filtered.length;
 
@@ -313,6 +326,7 @@
 </script>
 </body>
 </html>
+
 
 
 
